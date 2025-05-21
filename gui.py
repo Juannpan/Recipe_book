@@ -1,4 +1,12 @@
 import tkinter as tk
+from backend import recipe, recipe_manager
+
+#Gestor
+
+
+
+
+
 
 
 def open_input_window():
@@ -66,7 +74,8 @@ title.grid(row=0, column=0)
 title = tk.Label(root, text='Crea, registra y guarda tu receta', font=("Mongolian Baiti", 10), bg="#fff8f0")
 title.grid(row=1, column=0)
 
-registrar_receta = tk.Button(text='Registrar receta', font=("Mongolian Baiti", 10), command=open_input_window, bg="#4a90e2", fg="#ffffff")
+registrar_receta = tk.Button(text='Registrar receta', font=("Mongolian Baiti", 10), command=open_input_window,
+                              bg="#4a90e2", fg="#ffffff")
 registrar_receta.grid(row=2, column=0, sticky='nsew', padx=3, pady=3)
 
 ver_recetas = tk.Button(text='Ver receta', font=("Mongolian Baiti", 10), command=ver_receta, bg="#4a90e2", fg="#ffffff")
