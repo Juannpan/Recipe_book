@@ -2,8 +2,6 @@ import csv
 import os
 import random
 
-archive = 'recetas.csv'
-
 class recipe:
     def __init__(self, id_receta, cooking_time, recipe_name, recipe_degrees):
         self.id = id_receta
