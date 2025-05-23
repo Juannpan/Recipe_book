@@ -1,60 +1,63 @@
 import csv
 import os
 import random
+import math
 
 class recipe:
-    def __init__(self, id_receta, cooking_time, recipe_name, recipe_degrees):
+    def __init__(self, id_receta, recipe_name, recipe_degrees):
         self.id = id_receta
-        self.time = cooking_time
         self.name = recipe_name
-        self.degrees = recipe_degrees 
-        self.fdegrees = self.fahrenheit_converter() 
+        self.time = self.generate_cooking_time() 
+        self.degrees = recipe_degrees
+        self.fdegrees = self.fahrenheit_converter()
         
-    def fahrenheit_converter(self):
-        return round(self.degrees * 1.8 + 32)
+    def generate_cooking_time(self):
+        return random.randint(15, 90)
     
-    def row_converter(self):
+    def fahrenheit_converter(self):
+        fahrenheit = self.degrees * 1.8 + 32
+        return math.floor(fahrenheit) if fahrenheit - math.floor(fahrenheit) < 0.5 else math.ceil(fahrenheit)
+    
+    def to_row(self):
         return [self.id, self.name, self.time, self.degrees, self.fdegrees]
 
 class recipe_manager:
-    def __init__(self, archive):
-        self.archive = archive
-        self._initialize_csv()
+    def __init__(self, filename):
+        self.filename = filename
+        self._initialize_file()
     
-    def _initialize_csv(self):
-        if not os.path.exists(self.archive):
-            with open(self.archive, 'w', newline='') as f:
-                csv.writer(f).writerow(['ID', 'Nombre', 'Tiempo (min)', 'Temp. (C)', 'Temp. (F)'])
+    def _initialize_file(self):
+        if not os.path.exists(self.filename):
+            with open(self.filename, 'w', newline='') as f:
+                writer = csv.writer(f)
+                writer.writerow(['ID', 'Nombre', 'Tiempo (min)', 'Temp. (C)', 'Temp. (F)'])
     
     def get_last_id(self):
         try:
-            with open(self.archive, 'r') as f:
+            with open(self.filename, 'r') as f:
                 reader = csv.reader(f)
-                rows = list(reader)
-                return int(rows[-1][0]) if len(rows) > 1 else 0
+                rows = list(reader)[1:]  
+                return int(rows[-1][0]) if rows else 0
         except (FileNotFoundError, IndexError, ValueError):
             return 0
-        
-    def save_recipe(self, recipe):
-        with open(self.archive, 'a', newline='') as f:
-            csv.writer(f).writerow(recipe.row_converter())
-        
-    def id_by_recipe(self, id_buscado):
-        with open(self.archive, 'r') as f:
-            for row in csv.reader(f):
-                if row and row[0] == str(id_buscado):
+    
+    def save_recipe(self, receta):
+        with open(self.filename, 'a', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(receta.to_row())
+    
+    def get_recipe_by_id(self, recipe_id):
+        with open(self.filename, 'r') as f:
+            reader = csv.reader(f)
+            for row in reader:
+                if row and row[0] == str(recipe_id):
                     return row
         return None
     
-    def all_recipes(self):
-        if not os.path.exists(self.archive):
+    def get_all_recipes(self):
+        if not os.path.exists(self.filename):
             return []
-        with open(self.archive, 'r') as f:
-            return list(csv.reader(f))[1:]
-    
-    def make_recipe(self, name):
-        return recipe(
-            id_receta=self.get_last_id() + 1,
-            cooking_time=random.randint(15, 90),
-            recipe_name=name,
-            recipe_degrees=random.randint(120, 220))
+        
+        with open(self.filename, 'r') as f:
+            reader = csv.reader(f)
+            return list(reader)[1:] 
